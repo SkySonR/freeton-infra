@@ -1,0 +1,38 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+ 
+availabilityZones:
+  - "us-west-2a"
+  - "us-west-2b"
+
+metadata:
+  name: freeton-cluster
+  region: us-west-2
+  version: "1.15"
+ 
+managedNodeGroups:
+  - name: freeton-nodes
+    instanceType: t3a.xlarge
+    volumeSize: 20
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 3
+    privateNetworking: false
+    availabilityZones:
+      - "us-west-2a"
+      - "us-west-2b"
+    labels:
+      freeton: "true"
+    tags:
+      kubernetes.io/cluster/freeton-cluster: "owned"
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/freeton-cluster: "owned"
+      k8s.io/cluster-autoscaler/node-template/label/freeton: "true"
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        efs: true
+        albIngress: true

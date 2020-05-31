@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "freeton-node.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "freeton-node.name" . }}
+    helm.sh/chart: {{ include "freeton-node.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "freeton-node.fullname" . }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "freeton-node.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "freeton-node.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - {{ include "freeton-node.name" . }}
+            topologyKey: failure-domain.beta.kubernetes.io/zone
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: {{ .Chart.Name }}-validator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /opt/ton
+              name: persistent-storage
+            - name: keys
+              mountPath: /etc/ton/ton-keys
+          env:
+          {{- range $key, $value := $.Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+          {{- end }}
+          command:
+          - /bin/bash
+          args:
+          - -c
+          - echo "@hourly     cd /opt/net.ton.dev/scripts && ./validator_msig.sh ${STAKE} > /dev/stdout 2>&1" > /var/spool/cron/crontabs/root && /usr/sbin/cron -f
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /opt/ton
+              name: persistent-storage
+            - name: keys
+              mountPath: /etc/ton/ton-keys
+          ports:
+            - name: freeton-adnl
+              containerPort: {{ .Values.containerPort.adnl }}
+              protocol: UDP
+          env:
+          {{- range $key, $value := $.Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+          {{- end }}          
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - ((`./check_node_sync_status.sh | grep TIME_DIFF | awk '{ print $4 }'` <= -10)) && exit 1 || exit 0
+            initialDelaySeconds: 600
+            periodSeconds: 60
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+        - name: keys
+          configMap:
+            name: {{ .Release.Name }}-configmap
+{{- if not .Values.persistence.enabled }}
+       - name: persistent-storage
+         emptyDir: {}
+       - name: keys
+         emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: persistent-storage
+      spec:
+        accessModes:
+        {{- range .Values.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+  {{- if  .Values.persistence.storageClass }}
+        {{ include "persistence.storageClass" . }}
+  {{- end }}
+{{- end }}

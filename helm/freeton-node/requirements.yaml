@@ -1,0 +1,5 @@
+dependencies:
+- name: fluentd-cloudwatch
+  version: 0.12.1
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  condition: fluentd-cloudwatch.enabled

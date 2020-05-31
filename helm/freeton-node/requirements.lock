@@ -1,0 +1,9 @@
+dependencies:
+- name: fluentd-cloudwatch
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  version: 0.12.1
+- name: prometheus-operator
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 8.13.9
+digest: sha256:e76df32e6d97851ade5bd97cb7eebcba775bb61b90d342f70d7373fda90c64b6
+generated: 2020-05-31T22:10:48.677126598+03:00
