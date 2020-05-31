@@ -50,11 +50,16 @@ Deployment instruction:
     
     helm install node helm/freeton-node/
 
-Logs collected by FluentD to CloudWatch
+EC2 metrics/K8s Logs collected by FluentD to CloudWatch
 
 TODO:
-Alerts and Monitoring
+
+Validator node monitoring and dashboard
+
+Alerts (logs/metrics)
 
 Add TONTgBot
 
 Add one button deployment script
+
+Add 
