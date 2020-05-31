@@ -61,5 +61,3 @@ Alerts (logs/metrics)
 Add TONTgBot
 
 Add one button deployment script
-
-Add 
