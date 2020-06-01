@@ -34,6 +34,24 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
+        - name: {{ .Chart.Name }}-tgbot
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /opt/ton
+              name: persistent-storage
+            - name: keys
+              mountPath: /etc/ton/ton-keys
+            - name: tgbot-config
+              mountPath: /opt/tontgbot/config.py 
+              subPath: config.py
+          env:
+          {{- range $key, $value := $.Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+          {{- end }}
+          command:
+          - /opt/tontgbot/bot.py
         - name: {{ .Chart.Name }}-validator
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -95,6 +113,9 @@ spec:
         - name: keys
           configMap:
             name: {{ .Release.Name }}-configmap
+        - name: tgbot-config
+          configMap:
+            name: {{ .Release.Name }}-tgbot-configmap
 {{- if not .Values.persistence.enabled }}
        - name: persistent-storage
          emptyDir: {}

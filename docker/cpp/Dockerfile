@@ -23,12 +23,21 @@ WORKDIR "/opt/$TARGET_REPO/scripts"
 
 COPY entrypoint.sh entrypoint.sh
 
-RUN  chmod g+rwx -R "/opt" \ 
+RUN git clone https://github.com/anvme/TONTgBot.git /opt/tontgbot && chmod +x /opt/tontgbot/installsbot.sh \
+    && sed -i "s/TgBotAPIKey = '.*'/TgBotAPIKey = '${TG_API}'/g" /opt/tontgbot/config.py \
+    && cd /opt/tontgbot \
+    && chmod g+rwx -R "/opt" \ 
     && apt update \
-    && apt install -y openssl curl libreadline-dev sudo net-tools vim cron\
+    && apt install -y openssl curl libreadline-dev sudo net-tools vim cron traceroute python3-pip wget\
+    && pip3 install psutil \
+                    pyTelegramBotAPI \
+                    python-dotenv \
+                    matplotlib \
+                    numpy \
+                    pandas \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /etc/ton/election && chmod g+rwx -R "/etc/ton" \
-    && sed -i 's/ELECTIONS_WORK_DIR=".*"/ELECTIONS_WORK_DIR="\/etc\/ton\/election"/g' validator_msig.sh
+    && sed -i 's/ELECTIONS_WORK_DIR=".*"/ELECTIONS_WORK_DIR="\/etc\/ton\/election"/g' /opt/$TARGET_REPO/scripts/validator_msig.sh
 
 ENV HOME /etc/ton
 

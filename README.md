@@ -44,7 +44,11 @@ Deployment instruction:
 
     Generation guide https://docs.ton.dev/86757ecb2/v/0/p/708260-run-validator/t/08f3ce
 
-5. Deploy Helm chart for Validator Node
+5. TONTgBot integration (https://github.com/anvme/TONTgBot)
+
+    Add telegram token and id to helm/freeton-node/templates/configmap.yaml
+
+6. Deploy Helm chart for Validator Node
 
     helm dependencies update
     
@@ -57,7 +61,5 @@ TODO:
 Validator node monitoring and dashboard
 
 Alerts (logs/metrics)
-
-Add TONTgBot
 
 Add one button deployment script
