@@ -12,6 +12,7 @@ image:
 env:
   MY_ADDR: 
   STAKE: 13000
+  FIFTPATH: /opt/net.ton.dev/crypto/fift/lib/:/opt/net.ton.dev/ton/crypto/smartcont/
 
 nameOverride: ""
 fullnameOverride: ""

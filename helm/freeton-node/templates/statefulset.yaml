@@ -51,7 +51,7 @@ spec:
           - /bin/bash
           args:
           - -c
-          - echo "@hourly     cd /opt/net.ton.dev/scripts && ./validator_msig.sh ${STAKE} > /dev/stdout 2>&1" > /var/spool/cron/crontabs/root && /usr/sbin/cron -f
+          - echo "@hourly     cd /opt/net.ton.dev/scripts && HOME=/etc/ton ./validator_msig.sh ${STAKE}" > /var/spool/cron/crontabs/root && /usr/sbin/cron -f
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
