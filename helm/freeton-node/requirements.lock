@@ -1,6 +1,0 @@
-dependencies:
-- name: fluentd-cloudwatch
-  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
-  version: 0.12.1
-digest: sha256:6375316dc21f5998e04f15589943f40ca163bf5c5b6562fe53112d6042cd78c9
-generated: 2020-06-02T00:10:39.016685084+03:00

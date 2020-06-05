@@ -10,9 +10,13 @@ image:
   pullPolicy: Always
 
 env:
-  MY_ADDR: 
-  STAKE: 13000
+  MY_ADDR: "" #LB endpoint (need to set)
+  STAKE: 13001
   FIFTPATH: /opt/net.ton.dev/crypto/fift/lib/:/opt/net.ton.dev/ton/crypto/smartcont/
+
+tgbot:
+  apikey: "" #(need to set)
+  id: "" #(need to set)
 
 nameOverride: ""
 fullnameOverride: ""
@@ -20,14 +24,13 @@ fullnameOverride: ""
 fluentd-cloudwatch:
   enabled: true
   awsRegion: us-west-2
-  awsAccessKeyId: 
-  awsSecretAccessKey: 
+  awsAccessKeyId: ""
+  awsSecretAccessKey: ""
   rbac:
     create: true
 
 containerPort:
   adnl: 30310
-#  lite: 32767
 
 service:
   type: NodePort

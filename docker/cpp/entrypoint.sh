@@ -64,4 +64,4 @@ echo "INFO: setup TON node... DONE"
 
 echo "INFO: start TON node..."
 echo "INFO: logs to stdout/stderr"
-"${TON_BUILD_DIR}/validator-engine/validator-engine" -C "${TON_WORK_DIR}/etc/ton-global.config.json" --db "${TON_WORK_DIR}/db" > /dev/stdout 2> /dev/stderr
+"${TON_BUILD_DIR}/validator-engine/validator-engine" -C "${TON_WORK_DIR}/etc/ton-global.config.json" --db "${TON_WORK_DIR}/db" > >(tee -a ${TON_WORK_DIR}/node.log) 2> >(tee -a ${TON_WORK_DIR}/node_error.log >&2)

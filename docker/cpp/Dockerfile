@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git clone "https://github.com/tonlabs/$TARGET_REPO.git" "/opt/$TARGET_REPO" &&\
     cd "/opt/$TARGET_REPO/scripts" &&\
     sed -i 's/TON_WORK_DIR=".*"/TON_WORK_DIR="\/opt\/ton\/work"/g' env.sh &&\
-    ./env.sh && ./build.sh 
+    ./env.sh && ./build.sh
 
 FROM ubuntu:18.04
 
@@ -23,12 +23,8 @@ WORKDIR "/opt/$TARGET_REPO/scripts"
 
 COPY entrypoint.sh entrypoint.sh
 
-RUN git clone https://github.com/anvme/TONTgBot.git /opt/tontgbot && chmod +x /opt/tontgbot/installsbot.sh \
-    && sed -i "s/TgBotAPIKey = '.*'/TgBotAPIKey = '${TG_API}'/g" /opt/tontgbot/config.py \
-    && cd /opt/tontgbot \
-    && chmod g+rwx -R "/opt" \ 
-    && apt update \
-    && apt install -y openssl curl libreadline-dev sudo net-tools vim cron traceroute python3-pip wget\
+RUN apt update \
+    && apt install -y openssl curl libreadline-dev sudo net-tools vim cron traceroute python3-pip wget git inetutils-ping \
     && pip3 install psutil \
                     pyTelegramBotAPI \
                     python-dotenv \
@@ -36,8 +32,10 @@ RUN git clone https://github.com/anvme/TONTgBot.git /opt/tontgbot && chmod +x /o
                     numpy \
                     pandas \
     && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /etc/ton/election && chmod g+rwx -R "/etc/ton" \
-    && sed -i 's/ELECTIONS_WORK_DIR=".*"/ELECTIONS_WORK_DIR="\/etc\/ton\/election"/g' /opt/$TARGET_REPO/scripts/validator_msig.sh
+    && git clone https://github.com/anvme/TONTgBot.git /opt/tontgbot \
+    && chmod +x /opt/tontgbot/installsbot.sh \
+    && mkdir -p /etc/ton \
+    && chmod g+rwx -R "/etc/ton" "/opt"
 
 ENV HOME /etc/ton
 

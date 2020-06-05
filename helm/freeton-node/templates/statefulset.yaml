@@ -33,6 +33,20 @@ spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
+      initContainers:
+        - name: "configmap"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command:
+          - /bin/bash
+          - -c
+          - for i in `ls /mnt/ton-keys/`; do ln -s /mnt/ton-keys/$i /links/$i; done
+          volumeMounts:
+          - mountPath: /links
+            name: links
+          - name: keys 
+            mountPath: /mnt/ton-keys
+      shareProcessNamespace: true
       containers:
         - name: {{ .Chart.Name }}-tgbot
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -41,10 +55,14 @@ spec:
             - mountPath: /opt/ton
               name: persistent-storage
             - name: keys
-              mountPath: /etc/ton/ton-keys
+              mountPath: /mnt/ton-keys
+            - mountPath: /etc/ton/ton-keys
+              name: links
             - name: tgbot-config
               mountPath: /opt/tontgbot/config.py 
               subPath: config.py
+            - name: crontab-dir
+              mountPath: /var/spool/cron/crontabs
           env:
           {{- range $key, $value := $.Values.env }}
             - name: {{ $key }}
@@ -59,7 +77,11 @@ spec:
             - mountPath: /opt/ton
               name: persistent-storage
             - name: keys
-              mountPath: /etc/ton/ton-keys
+              mountPath: /mnt/ton-keys
+            - mountPath: /etc/ton/ton-keys
+              name: links
+            - name: crontab-dir
+              mountPath: /var/spool/cron/crontabs
           env:
           {{- range $key, $value := $.Values.env }}
             - name: {{ $key }}
@@ -69,7 +91,7 @@ spec:
           - /bin/bash
           args:
           - -c
-          - echo "@hourly     cd /opt/net.ton.dev/scripts && HOME=/etc/ton ./validator_msig.sh ${STAKE}" > /var/spool/cron/crontabs/root && /usr/sbin/cron -f
+          - echo "@hourly     cd /opt/net.ton.dev/scripts && HOME=/etc/ton ./validator_msig.sh ${STAKE}  > /proc/\$(cat /var/run/crond.pid)/fd/1 2>&1" > /var/spool/cron/crontabs/root && /usr/sbin/cron -f -L /dev/stdout
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -77,7 +99,11 @@ spec:
             - mountPath: /opt/ton
               name: persistent-storage
             - name: keys
-              mountPath: /etc/ton/ton-keys
+              mountPath: /mnt/ton-keys
+            - mountPath: /etc/ton/ton-keys
+              name: links
+            - name: crontab-dir
+              mountPath: /var/spool/cron/crontabs
           ports:
             - name: freeton-adnl
               containerPort: {{ .Values.containerPort.adnl }}
@@ -92,7 +118,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - ((`./check_node_sync_status.sh | grep TIME_DIFF | awk '{ print $4 }'` <= -10)) && exit 1 || exit 0
+                - ((`/opt/net.ton.dev/scripts/check_node_sync_status.sh | grep TIME_DIFF | awk '{ print $4 }'` <= -10)) && exit 1 || exit 0
             initialDelaySeconds: 600
             periodSeconds: 60
           resources:
@@ -110,9 +136,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
+        - name: links
+          emptyDir: {}
+        - name: crontab-dir
+          emptyDir: {}
         - name: keys
           configMap:
-            name: {{ .Release.Name }}-configmap
+            name: {{ $.Release.Name }}-configmap
         - name: tgbot-config
           configMap:
             name: {{ .Release.Name }}-tgbot-configmap

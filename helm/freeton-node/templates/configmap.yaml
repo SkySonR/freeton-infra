@@ -24,15 +24,15 @@ data:
     
     # ##### TONTgBot Config
     # Edit starts here
-    TgBotAPIKey = 'need to set' # API Keythat you get from @BotFather
-    tg = 'need to set' # Your id, you can get it by sending command /id to bot @TONTgIDBot
+    TgBotAPIKey = '{{ .Values.tgbot.apikey }}' # API Keythat you get from @BotFather
+    tg = '{{ .Values.tgbot.id }}' # Your id, you can get it by sending command /id to bot @TONTgIDBot
     ud = '/opt/net.ton.dev/ton/build/utils' # UTILS_DIR | You can easy get it from $ env command. Be sure, before this command you run env.sh
     tk = '/etc/ton/ton-keys/' # KEYS_DIR | You can easy get it from $ env command. Be sure, before this command you run env.sh
     tf = '/opt/net.ton.dev/' # NET_TON_DEV_SRC_TOP_DIR | You can easy get it from $ env command. Be sure, before this command you run env.sh
     # Edit ends here
     
     vu = 'https://net.ton.live/validators?section=details&public_key='
-    tw = '/var/ton-work' # TON work dir
+    tw = '/opt/ton/work' # TON work dir
     tontgpath = '/opt/tontgbot' # Folder with this bot. Do not edit!
     
     # Other
