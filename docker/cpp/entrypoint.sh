@@ -24,7 +24,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 && > ${TON_WORK_DIR}/done \
 && mkdir -p "${TON_WORK_DIR}/etc" \
 && mkdir -p "${TON_WORK_DIR}/db" \
-&& cp "${CONFIGS_DIR}/ton-global.config.json" "${TON_WORK_DIR}/etc/ton-global.config.json" \
+&& cp "${CONFIGS_DIR}/${NETWORK_TYPE}/ton-global.config.json" "${TON_WORK_DIR}/etc/ton-global.config.json" \
 && echo "INFO: generate initial ${TON_WORK_DIR}/db/config.json..." \
 && "${TON_BUILD_DIR}/validator-engine/validator-engine" -C "${TON_WORK_DIR}/etc/ton-global.config.json" --db "${TON_WORK_DIR}/db" --ip "${MY_ADDR}:${ADNL_PORT}" \
 && cp "${KEYS_DIR}/server" "${TON_WORK_DIR}/db/keyring/$(awk '{print $1}' "${KEYS_DIR}/keys_s")" \
