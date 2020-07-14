@@ -1,6 +1,7 @@
 FROM ubuntu:18.04 as builder
 
 ARG TARGET_REPO=net.ton.dev
+ARG NETWORK_TYPE=game0
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         sudo \
@@ -16,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM ubuntu:18.04
 
 ARG TARGET_REPO=net.ton.dev
+ARG
 
 COPY --from=builder /opt/$TARGET_REPO /opt/$TARGET_REPO
 
